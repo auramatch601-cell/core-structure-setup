@@ -14,16 +14,306 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bet_limits: {
+        Row: {
+          created_at: string
+          id: string
+          market_name: string
+          max_stake: number
+          max_win: number
+          min_stake: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          market_name?: string
+          max_stake?: number
+          max_win?: number
+          min_stake?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          market_name?: string
+          max_stake?: number
+          max_win?: number
+          min_stake?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bets: {
+        Row: {
+          id: string
+          market_name: string
+          match_id: string
+          match_title: string
+          odds: number
+          placed_at: string
+          potential_win: number
+          profit_loss: number | null
+          selection_label: string
+          settled_at: string | null
+          stake: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          market_name: string
+          match_id: string
+          match_title: string
+          odds: number
+          placed_at?: string
+          potential_win: number
+          profit_loss?: number | null
+          selection_label: string
+          settled_at?: string | null
+          stake: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          market_name?: string
+          match_id?: string
+          match_title?: string
+          odds?: number
+          placed_at?: string
+          potential_win?: number
+          profit_loss?: number | null
+          selection_label?: string
+          settled_at?: string | null
+          stake?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      market_suspensions: {
+        Row: {
+          id: string
+          market_name: string
+          match_id: string
+          reason: string | null
+          suspended_at: string
+          suspended_by: string | null
+        }
+        Insert: {
+          id?: string
+          market_name: string
+          match_id: string
+          reason?: string | null
+          suspended_at?: string
+          suspended_by?: string | null
+        }
+        Update: {
+          id?: string
+          market_name?: string
+          match_id?: string
+          reason?: string | null
+          suspended_at?: string
+          suspended_by?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          read: boolean
+          reference_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          reference_id?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          reference_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          aadhaar_number: string | null
+          avatar_url: string | null
+          created_at: string
+          date_of_birth: string | null
+          display_name: string | null
+          id: string
+          kyc_reject_reason: string | null
+          kyc_reviewed_at: string | null
+          kyc_status: string
+          kyc_submitted_at: string | null
+          pan_number: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          aadhaar_number?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          display_name?: string | null
+          id?: string
+          kyc_reject_reason?: string | null
+          kyc_reviewed_at?: string | null
+          kyc_status?: string
+          kyc_submitted_at?: string | null
+          pan_number?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          aadhaar_number?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          display_name?: string | null
+          id?: string
+          kyc_reject_reason?: string | null
+          kyc_reviewed_at?: string | null
+          kyc_status?: string
+          kyc_submitted_at?: string | null
+          pan_number?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          status?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          status?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_balances: {
+        Row: {
+          balance: number
+          bonus_balance: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          bonus_balance?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          bonus_balance?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      place_bet_atomic: {
+        Args: {
+          p_market_name: string
+          p_match_id: string
+          p_match_title: string
+          p_odds: number
+          p_potential_win: number
+          p_selection_label: string
+          p_stake: number
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +440,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
