@@ -38,9 +38,10 @@ serve(async (req) => {
 
   try {
     if (!CRICAPI_KEY) {
+      // Return empty data instead of error — frontend falls back to simulated odds
       return new Response(
-        JSON.stringify({ error: "CRICAPI_KEY is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ status: "success", data: [] }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

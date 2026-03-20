@@ -6,7 +6,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useBetSlip } from "@/hooks/useBetSlip";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useLiveOdds } from "@/hooks/useLiveOdds";
-import { useWallet } from "@/hooks/useWallet";
+import { useWallet, WalletState } from "@/hooks/useWallet";
 import { useMarketSuspensions } from "@/hooks/useMarketSuspensions";
 import { useAuth } from "@/context/AuthContext";
 import { Sport } from "@/data/mockData";
@@ -19,7 +19,7 @@ export interface LayoutContext {
   betSlip: ReturnType<typeof useBetSlip>;
   activeSport: Sport | "All";
   setActiveSport: (s: Sport | "All") => void;
-  wallet: ReturnType<typeof useWallet>;
+  wallet: WalletState;
   suspensions: ReturnType<typeof useMarketSuspensions>;
 }
 
@@ -53,13 +53,11 @@ const AppLayout: React.FC = () => {
     ? "..."
     : `₹${wallet.balance.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
-  // Build a flat list of suspended markets for BetSlip
   const suspendedMarketsList = suspensions.suspensions.map((s) => ({
     matchId: s.match_id,
     marketName: s.market_name,
   }));
 
-  // Odds-change adapter for BetSlip
   const oddsChangedForSlip = betSlip.oddsChangedSel
     ? {
         selectionLabel: betSlip.oddsChangedSel.selectionLabel,
@@ -102,7 +100,7 @@ const AppLayout: React.FC = () => {
         </div>
         <div className="flex items-center gap-1">
           <button onClick={() => navigate("/wallet")} className="p-2 text-muted-foreground hover:text-foreground">
-            <Wallet className="w-4.5 h-4.5" />
+            <Wallet className="w-4 h-4" />
           </button>
           <NotificationBell
             notifications={notifs.notifications}
@@ -111,7 +109,7 @@ const AppLayout: React.FC = () => {
             onMarkRead={notifs.markRead}
           />
           <button onClick={() => navigate("/profile")} className="p-2 text-muted-foreground hover:text-foreground">
-            <User className="w-4.5 h-4.5" />
+            <User className="w-4 h-4" />
           </button>
         </div>
       </header>

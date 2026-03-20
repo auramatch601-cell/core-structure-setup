@@ -7,8 +7,8 @@ export interface WalletState {
   bonusBalance: number;
   loading: boolean;
   refresh: () => Promise<void>;
-  debit: (amount: number, description: string, referenceId?: string) => Promise<boolean>;
-  credit: (amount: number, type: "deposit" | "bet_win" | "bet_refund" | "bonus", description: string) => Promise<boolean>;
+  deposit: (amount: number, description?: string) => Promise<boolean>;
+  withdraw: (amount: number, description?: string) => Promise<boolean>;
 }
 
 export function useWallet(): WalletState {
@@ -35,67 +35,54 @@ export function useWallet(): WalletState {
     if (!user) { setLoading(false); return; }
     refresh();
 
-    // Real-time subscription on wallet changes
     const channel = supabase
       .channel(`wallet:${user.id}`)
       .on("postgres_changes", {
-        event: "UPDATE",
+        event: "*",
         schema: "public",
         table: "wallet_balances",
         filter: `user_id=eq.${user.id}`,
       }, (payload) => {
-        setBalance(Number((payload.new as { balance: number }).balance));
-        setBonusBalance(Number((payload.new as { bonus_balance: number }).bonus_balance));
+        if (payload.new && typeof payload.new === "object") {
+          const row = payload.new as { balance: number; bonus_balance: number };
+          setBalance(Number(row.balance));
+          setBonusBalance(Number(row.bonus_balance));
+        }
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
   }, [user, refresh]);
 
-  const debit = useCallback(async (amount: number, description: string, referenceId?: string): Promise<boolean> => {
-    if (!user || balance < amount) return false;
-    const newBalance = balance - amount;
-    const { error: wErr } = await supabase
-      .from("wallet_balances")
-      .update({ balance: newBalance })
-      .eq("user_id", user.id);
-    if (wErr) return false;
-
-    await supabase.from("transactions").insert({
-      user_id: user.id,
-      type: "bet_placed",
-      amount: -amount,
-      balance_after: newBalance,
-      description,
-      reference_id: referenceId,
+  const deposit = useCallback(async (amount: number, description?: string): Promise<boolean> => {
+    if (!user || amount <= 0) return false;
+    const { data, error } = await supabase.rpc("wallet_deposit", {
+      p_amount: amount,
+      p_description: description ?? "Deposit via UPI",
     });
-    setBalance(newBalance);
-    return true;
-  }, [user, balance]);
+    if (error) return false;
+    const result = data as { success?: boolean; balance?: number; error?: string };
+    if (result?.success && result.balance != null) {
+      setBalance(result.balance);
+      return true;
+    }
+    return false;
+  }, [user]);
 
-  const credit = useCallback(async (
-    amount: number,
-    type: "deposit" | "bet_win" | "bet_refund" | "bonus",
-    description: string
-  ): Promise<boolean> => {
-    if (!user) return false;
-    const newBalance = balance + amount;
-    const { error: wErr } = await supabase
-      .from("wallet_balances")
-      .update({ balance: newBalance })
-      .eq("user_id", user.id);
-    if (wErr) return false;
-
-    await supabase.from("transactions").insert({
-      user_id: user.id,
-      type,
-      amount,
-      balance_after: newBalance,
-      description,
+  const withdraw = useCallback(async (amount: number, description?: string): Promise<boolean> => {
+    if (!user || amount <= 0) return false;
+    const { data, error } = await supabase.rpc("wallet_withdraw", {
+      p_amount: amount,
+      p_description: description ?? "Withdrawal request",
     });
-    setBalance(newBalance);
-    return true;
-  }, [user, balance]);
+    if (error) return false;
+    const result = data as { success?: boolean; balance?: number; error?: string };
+    if (result?.success && result.balance != null) {
+      setBalance(result.balance);
+      return true;
+    }
+    return false;
+  }, [user]);
 
-  return { balance, bonusBalance, loading, refresh, debit, credit };
+  return { balance, bonusBalance, loading, refresh, deposit, withdraw };
 }
