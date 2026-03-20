@@ -28,28 +28,23 @@ export function useBetsDB() {
     const channel = supabase
       .channel(`bets:${user.id}`)
       .on("postgres_changes", {
-        event: "INSERT",
+        event: "*",
         schema: "public",
         table: "bets",
         filter: `user_id=eq.${user.id}`,
       }, (payload) => {
-        setBets((prev) => [payload.new as Bet, ...prev]);
+        if (payload.eventType === "INSERT") {
+          setBets((prev) => [payload.new as Bet, ...prev]);
+        } else if (payload.eventType === "UPDATE") {
+          setBets((prev) =>
+            prev.map((b) => b.id === (payload.new as Bet).id ? (payload.new as Bet) : b)
+          );
+        }
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
   }, [user, fetchBets]);
 
-  const placeBet = useCallback(async (bet: Omit<Database["public"]["Tables"]["bets"]["Insert"], "user_id">): Promise<string | null> => {
-    if (!user) return null;
-    const { data, error } = await supabase
-      .from("bets")
-      .insert({ ...bet, user_id: user.id })
-      .select("id")
-      .single();
-    if (error) return null;
-    return data.id;
-  }, [user]);
-
-  return { bets, loading, fetchBets, placeBet };
+  return { bets, loading, fetchBets };
 }

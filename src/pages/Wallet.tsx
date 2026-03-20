@@ -47,7 +47,6 @@ const Wallet: React.FC = () => {
     };
     fetchTx();
 
-    // Real-time updates for new transactions
     const channel = supabase
       .channel(`tx:${user.id}`)
       .on("postgres_changes", {
@@ -67,7 +66,7 @@ const Wallet: React.FC = () => {
     const amt = parseFloat(amount);
     if (!amt || amt <= 0) return;
     setDepositing(true);
-    const ok = await wallet.credit(amt, "deposit", `Deposit via UPI`);
+    const ok = await wallet.deposit(amt, `Deposit via UPI`);
     setMsg({ text: ok ? `₹${amt.toLocaleString("en-IN")} deposited successfully!` : "Deposit failed.", ok });
     setDepositing(false);
     if (ok) { setAmount(""); setShowDeposit(false); }
@@ -78,8 +77,7 @@ const Wallet: React.FC = () => {
     const amt = parseFloat(amount);
     if (!amt || amt <= 0 || amt > wallet.balance) return;
     setWithdrawing(true);
-    // Record withdrawal as a debit transaction
-    const ok = await wallet.debit(amt, `Withdrawal request`);
+    const ok = await wallet.withdraw(amt, `Withdrawal request`);
     setMsg({ text: ok ? `₹${amt.toLocaleString("en-IN")} withdrawal initiated.` : "Insufficient balance.", ok });
     setWithdrawing(false);
     if (ok) { setAmount(""); setShowWithdraw(false); }
