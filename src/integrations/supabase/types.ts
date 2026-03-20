@@ -311,6 +311,22 @@ export type Database = {
         }
         Returns: Json
       }
+      settle_bet_batch: {
+        Args: {
+          p_match_id: string
+          p_match_title: string
+          p_winner_label: string
+        }
+        Returns: Json
+      }
+      wallet_deposit: {
+        Args: { p_amount: number; p_description?: string }
+        Returns: Json
+      }
+      wallet_withdraw: {
+        Args: { p_amount: number; p_description?: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
